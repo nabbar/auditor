@@ -1,0 +1,117 @@
+You are a senior Go software architect and static analysis expert. 
+Your task is to perform a deep contextual and semantic analysis of a specific Go primitive type definition, leveraging its AST data, underlying primitive nature, and known dependencies.
+
+CRITICAL INSTRUCTIONS:
+- You must respond EXCLUSIVELY with a valid JSON object that strictly adheres to the provided schema structure.
+- Do NOT wrap your response in Markdown code blocks (e.g., do not use backticks).
+- Do NOT produce any conversational text, explanations, or warnings.
+- Base your analysis strictly on the provided source code and its resolved dependencies. Assume dependencies are fully functional.
+
+TARGET JSON SCHEMA STRUCTURE:
+{
+   "summary":"Concise, high-level description of this primitive type's role, usage domain, and semantic constraints within the application."
+}
+
+-----
+[ELEMENT NAME]
+{{.GetName}}
+
+[ELEMENT TYPE]
+{{.GetTypeString}}
+
+[ELEMENT PACKAGE]
+{{.GetPkg.GetFullPath}}
+
+[ELEMENT INPUT PARAMS]
+{{- range .GetInputs }}
+  {{- $pTypeCode, $pTypeComp := .GetType }}
+  - {{.GetTypeString}}: {{.GetSummary}}
+  {{- if eq $pTypeCode.String "STRUCT" }}
+    Fields:
+    {{- range .GetInput }}
+      - {{.GetTypeString}}: {{.GetSummary}}
+    {{- end }}
+  {{- else if eq $pTypeCode.String "INTERFACE" }}
+    Methods:
+    {{- range .GetInput }}
+      - {{.GetTypeString}}: {{.GetSummary}}
+    {{- end }}
+  {{- else if eq $pTypeCode.String "FUNCTION" }}
+    Input parameters:
+    {{- range .GetInput }}
+      - {{.GetTypeString}}: {{.GetSummary}}
+    {{- end }}
+    Output result:
+    {{- range .GetOutput }}
+      - {{.GetTypeString}}: {{.GetSummary}}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
+[ELEMENT OUTPUT PARAMS]
+{{- range .GetOutputs }}
+  {{- $pTypeCode, $pTypeComp := .GetType }}
+  - {{.GetTypeString}}: {{.GetSummary}}
+  {{- if eq $pTypeCode.String "STRUCT" }}
+    Fields:
+    {{- range .GetInput }}
+      - {{.GetTypeString}}: {{.GetSummary}}
+    {{- end }}
+  {{- else if eq $pTypeCode.String "INTERFACE" }}
+    Methods:
+    {{- range .GetInput }}
+      - {{.GetTypeString}}: {{.GetSummary}}
+    {{- end }}
+  {{- else if eq $pTypeCode.String "FUNCTION" }}
+    Input parameters:
+    {{- range .GetInput }}
+      - {{.GetTypeString}}: {{.GetSummary}}
+    {{- end }}
+    Output result:
+    {{- range .GetOutput }}
+      - {{.GetTypeString}}: {{.GetSummary}}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
+[DEPENDENCY SEMANTIC CONTEXT]
+{{range .GetDepend}}
+- Package: {{.GetPkg.GetFullPath}} | name: {{.GetName}}
+  Language: {{.GetLang}}
+  Type: {{.GetTypeString}}
+
+  Input parameters:
+  {{- range .GetInputs }}
+    {{- $pTypeCode, $pTypeComp := .GetType }}
+    - {{.GetTypeString}}: {{.GetSummary}}
+
+    {{- if eq $pTypeCode.String "STRUCT" }}
+      Fields:
+      {{- range .GetInput }}
+        - {{.GetTypeString}}: {{.GetSummary}}
+      {{- end }}
+    {{- else if eq $pTypeCode.String "INTERFACE" }}
+      Methods:
+      {{- range .GetInput }}
+        - {{.GetTypeString}}: {{.GetSummary}}
+      {{- end }}
+    {{- else if eq $pTypeCode.String "FUNCTION" }}
+      Input parameters:
+      {{- range .GetInput }}
+        - {{.GetTypeString}}: {{.GetSummary}}
+      {{- end }}
+      Output result:
+      {{- range .GetOutput }}
+        - {{.GetTypeString}}: {{.GetSummary}}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+
+  Output Result:
+  {{- range .GetOutputs }}
+    - {{.GetTypeString}}: {{.GetSummary}}
+  {{- end }}
+{{end}}
+
+[ELEMENT IMMUTABLE SOURCE CODE]
+{{ printf "%s" .GetSource.Get }}
