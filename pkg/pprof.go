@@ -1,5 +1,5 @@
-//go:build netgo
-// +build netgo
+//go:build pprof
+// +build pprof
 
 /*
  * MIT License
@@ -25,18 +25,41 @@
  * SOFTWARE.
  */
 
-// Package main serves as the primary entry point and lifecycle orchestrator for the Auditor system.
-// It is responsible for parsing command-line interface (CLI) arguments, configuring the logging
-// subsystem, initializing the database and LLM interaction layers, and executing the multi-pass
-// source code analysis pipeline.
-package main
+package pkg
 
 import (
-	audcmd "github.com/nabbar/auditor/cmd"
+	"fmt"
+	"net/http"
+	"strconv"
+	"time"
+
+	loglvl "github.com/nabbar/golib/logger/level"
 )
 
-// main acts as the central orchestrator for the application's runtime. It manages context lifecycle,
-// initializes subsystems (UI, DB, LLM, Engine), and executes the sequential multi-pass analysis.
-func main() {
-	audcmd.Execute()
+var flgTracePort uint16
+
+func PPRofFlags() {
+	// Add & Mark flag pprof as hidden
+	GetCobra().AddFlagUint16(true, &flgTracePort, "trace-listen-port", "", 0, "Enable a trace http server to the given port number (callable by http://localhost:<given port>/debug/pprof)")
+	GetLogger().CheckError(loglvl.FatalLevel, loglvl.DebugLevel, "mark hidden flag trace", GetCobra().Cobra().PersistentFlags().MarkHidden("trace-listen-port"))
+}
+
+func PPRofStart() {
+	if flgTracePort < 1 {
+		return
+	}
+
+	GetLogger().Entry(loglvl.InfoLevel, "init pprof server").FieldAdd("Address", "http://localhost:"+strconv.Itoa(flgTracePort)+"/debug/pprof").Log()
+
+	go func() {
+		for {
+			time.Sleep(5 * time.Second)
+
+			if GetContext().Err() != nil {
+				return
+			}
+
+			GetLogger().Entry(loglvl.ErrorLevel, "starting pprof server").FieldAdd("Address", "http://localhost:"+strconv.Itoa(flgTracePort)+"/debug/pprof").ErrorAdd(true, http.ListenAndServe(fmt.Sprintf("localhost:%d", flgTracePort), nil)).Check(loglvl.InfoLevel)
+		}
+	}()
 }
