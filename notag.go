@@ -1,5 +1,5 @@
-//go:build netgo
-// +build netgo
+//go:build !netgo
+// +build !netgo
 
 /*
  * MIT License
@@ -25,18 +25,14 @@
  * SOFTWARE.
  */
 
-// Package main serves as the primary entry point and lifecycle orchestrator for the Auditor system.
-// It is responsible for parsing command-line interface (CLI) arguments, configuring the logging
-// subsystem, initializing the database and LLM interaction layers, and executing the multi-pass
-// source code analysis pipeline.
 package main
 
 import (
-	audcmd "github.com/nabbar/auditor/cmd"
+	"fmt"
+	"os"
 )
 
-// main acts as the central orchestrator for the application's runtime. It manages context lifecycle,
-// initializes subsystems (UI, DB, LLM, Engine), and executes the sequential multi-pass analysis.
 func main() {
-	audcmd.Execute()
+	_, _ = fmt.Fprintf(os.Stderr, "\n\nError: this binary was not built with mandatory tag '-tags \"netgo\"'.\nRebuild this before used.")
+	os.Exit(1)
 }

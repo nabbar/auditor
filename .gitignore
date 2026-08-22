@@ -1,3 +1,55 @@
-vendor
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+*.cover*
+*/cover*.out
+*/cover*.html
+*/*/cover*.out
+*/*/cover*.html
+*/**/cover*.out
+*/**/cover*.html
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+coverage*.out
+coverage*.txt
+coverage*.log
+res_*.log
+res_*.svg
+res_*.png
+res_*.out
+res_*.txt
+
+# Dependency directories (remove the comment below to include it)
+vendor/
+vendor*/
+*.lock
 go.sum
+
+# Jetbrain IDE files
+.idea/
+.idea/*
+.idea/**/*
+
+# remove minio from aws package
+aws/minio
+
+# other
+/scripts
+/test-*
+
+config.yaml
+config.yml
+
+*.json
+*.toml
+*.log
+.auditor/
+/auditor
 
